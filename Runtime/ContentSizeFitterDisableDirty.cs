@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,7 +17,9 @@ namespace Kogane.Internal
         private TMP_Text          TmpText           => m_tmpTextCache != null ? m_tmpTextCache : m_tmpTextCache = GetComponent<TMP_Text>();
         private ContentSizeFitter ContentSizeFitter => m_contentSizeFitterCache != null ? m_contentSizeFitterCache : m_contentSizeFitterCache = GetComponent<ContentSizeFitter>();
 
+        private bool   m_isInitialize;
         private string m_text;
+        private float  m_fontSize;
 
         private static bool IsPlaying =>
 #if UNITY_EDITOR
@@ -41,20 +44,24 @@ namespace Kogane.Internal
         {
             if ( IsPlaying ) return;
 
-            var currentText = TmpText.text;
+            var currentText     = TmpText.text;
+            var currentFontSize = TmpText.fontSize;
 
-            if ( m_text == null )
+            if ( !m_isInitialize )
             {
-                m_text = currentText;
+                m_isInitialize = true;
+                m_text         = currentText;
+                m_fontSize     = currentFontSize;
                 return;
             }
 
-            if ( m_text != currentText )
+            if ( m_text != currentText || 0.001f < Math.Abs( m_fontSize - currentFontSize ) )
             {
                 Apply();
             }
 
-            m_text = currentText;
+            m_text     = currentText;
+            m_fontSize = currentFontSize;
         }
 
         private void Apply()
